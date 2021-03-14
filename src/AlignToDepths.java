@@ -1,33 +1,58 @@
+import java.awt.desktop.SystemEventListener;
 import java.io.*;
 import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class AlignToDepths {
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(args[0]));
-        ArrayList<String> align = new ArrayList<>();
-        String str = null;
-        while ((str = br.readLine()) != null){
-//            temp.add(str.split("\t"));
-            String[] aa = str.split("\t");
-            align.add(aa[0] + aa[1]);
-        }
-        br.close();
+        writeFile(args[0], args[1]);
+    }
 
-        BufferedReader br2 = new BufferedReader(new FileReader(args[1]));
-        BufferedWriter bw = new BufferedWriter(new FileWriter(args[2]));
-        String str2;
-        while ((str2 = br2.readLine()) != null){
-            String[] aa = str2.split("\t");
-            if (align.contains(aa[0] + aa[1])){
-                bw.write(str2);
-                bw.newLine();
+    public static List<Set<Integer>> readDic(String filename, int index){
+        List<Set<Integer>> res = new ArrayList<>();
+        for (int i = 0; i < index; i++) {
+            res.add(new HashSet<Integer>()
+            );
+        }
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String str ;
+            while ((str=br.readLine()) != null){
+                String[] temp = str.split("\t");
+                res.get(Integer.parseInt(temp[0]) -1).add(Integer.parseInt(temp[1]));
             }
+            br.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
         }
+        return res;
+    }
 
-        bw.close();
-        br2.close();
+    public static void writeFile(String depth, String bed){
+        if (!depth.contains("depth") || !bed.contains("bed")){
+            System.out.println("File is not right, end plz");
+        }
+        List<Set<Integer>> lists = readDic(bed, 42);
+        String out = depth.split("\\.")[0].split("/")[5] + ".out";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(depth));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(out));
+            String str;
+            while ((str=br.readLine()) != null){
+                String[] temp = str.split("\t");
+                if (!str.startsWith("0") && !str.startsWith("43") && !str.startsWith("44")){
+                    if (lists.get(Integer.parseInt(temp[0]) - 1).contains(Integer.parseInt(temp[1]))){
+                        bw.write(str);
+                        bw.write("\n");
+                    }
+                }
+            }
+            bw.close();
+            br.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

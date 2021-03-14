@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class burnAfterRead {
     public static void main(String[] args) {
-        MyInterFace<String> mf = (String s) -> System.out.println(s);
+        MyInterFace<String> mf = s -> System.out.println(s);
         //lambda 用于函数式接口的实现。接口的实现需要一个函数的传入，类似method4。 此时lambda相当于一个函数（编程意义上的函数，参数，方法体，返回值）。
+        //lambda 给一个方法传递mf等价于传递lambda表达式。这是一种把方法作为参数进行传递的编程思想。
         mf.test("This is method1, lambda");
 
         MF<String> mf2 = new MF<>();
@@ -28,6 +30,8 @@ public class burnAfterRead {
             System.out.print(var.charAt(i));
             System.out.print("-");
         }
+        List<String> strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
+        List<String> filtered = strings.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
     }
 }
 
