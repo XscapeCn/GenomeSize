@@ -21,13 +21,10 @@ public class StreamDepth extends AlignToDepths{
             }
         }
 
-
-
         for (String file:files) {
             try {
                 streamRead(file);
 //                BufferedReader br = new BufferedReader(new FileReader(file));
-
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -36,7 +33,9 @@ public class StreamDepth extends AlignToDepths{
         }
     }
 
+    public StreamDepth() {
 
+    }
 
     public void streamRead(String file) throws IOException, InterruptedException {
         String out = file.split("\\.")[0] + ".out";
@@ -49,8 +48,8 @@ public class StreamDepth extends AlignToDepths{
         BufferedWriter bw = BufferedFileWriter(out);
         String str;
         while ((str=br.readLine()) != null){
-            String[] temp = str.split("\t");
             if (!str.startsWith("0") && !str.startsWith("43") && !str.startsWith("44")){
+                String[] temp = str.split("\t");
                 if (refBed.get(Integer.parseInt(temp[0]) - 1).contains(Integer.parseInt(temp[1]))){
                     bw.write(str);
                     bw.write("\n");
@@ -58,7 +57,6 @@ public class StreamDepth extends AlignToDepths{
             }
         }
         p.waitFor();
-
         bw.close();
         br.close();
 //        String temp = null;
@@ -67,10 +65,9 @@ public class StreamDepth extends AlignToDepths{
 //        }
     }
 
-    public BufferedWriter BufferedFileWriter(String aa) throws IOException {
+    public static BufferedWriter BufferedFileWriter(String aa) throws IOException {
         return new BufferedWriter(new FileWriter(aa));
     }
-
 
 //    public void writeFile(BufferedReader br, String out){
 //        try {
@@ -97,6 +94,5 @@ public class StreamDepth extends AlignToDepths{
     public static void main(String[] args) {
         StreamDepth sd = new StreamDepth(args[0], args[1], Integer.parseInt(args[2]));
     }
-
-
 }
+
