@@ -166,7 +166,7 @@ public class TransferBed {
                     bw2.write(Integer.parseInt(temp[2]) - table.get(key) + "\t");
 //                    bw2.write("\t");
                     bw2.write(temp[3]);bw2.write("\t");
-                    bw2.write(temp[4]);bw2.write("\t");
+//                    bw2.write(temp[4]);bw2.write("\t");
                     bw2.write("\n");
                 }
             }

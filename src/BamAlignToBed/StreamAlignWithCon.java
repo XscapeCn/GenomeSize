@@ -1,9 +1,8 @@
 package BamAlignToBed;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 
 public class StreamAlignWithCon extends StreamAlignToBed{
     int pool;

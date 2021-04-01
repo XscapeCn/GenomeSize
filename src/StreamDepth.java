@@ -1,8 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-import java.util.stream.Stream;
-
 public class StreamDepth extends AlignToDepths{
     List<Set<Integer>> refBed;
 
@@ -59,10 +57,6 @@ public class StreamDepth extends AlignToDepths{
         p.waitFor();
         bw.close();
         br.close();
-//        String temp = null;
-//        while ((temp = br.readLine()) != null) {
-//            int geneNumber = Integer.parseInt(temp.split(" ")[0]);
-//        }
     }
 
     public static BufferedWriter BufferedFileWriter(String aa) throws IOException {

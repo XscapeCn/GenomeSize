@@ -33,13 +33,46 @@ public class burnAfterRead {
         List<String> strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
         List<String> filtered = strings.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
     }
+
+    public void method1(String str1){
+        Thread t1 = new Thread(
+                () -> System.out.println(str1)
+        );
+        t1.start();
+    }
+
 }
 
 interface MyInterFace<T>{
-    void test(T avr);
+    void test(T var);
+}
+
+interface MyInterFace2<T>{
+    void test();
+}
+
+class MF2<T> implements MyInterFace2<T>{
+    T var;
+
+    public MF2(T var){
+        this.var = var;
+    }
+
+    @Override
+    public void test() {
+        System.out.println(this.var);
+    }
+
+    public static void charByChar(String var){
+        for (int i = 0; i < var.length(); i++) {
+            System.out.print(var.charAt(i));
+            System.out.print("-");
+        }
+    }
 }
 
 class MF<T> implements MyInterFace<T>{
+
     @Override
     public void test(T var) {
         System.out.println(var);

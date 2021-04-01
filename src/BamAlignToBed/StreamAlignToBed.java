@@ -64,11 +64,12 @@ public class StreamAlignToBed{
     }
 
     public BufferedReader readBamViaStream(String file){
+        System.out.println("Start reading bam "+ file+ ".");
         BufferedReader aa = null;
         try{
             String command = "samtools depth -Q 20 " + file;
             String [] cmdArray ={"/bin/bash","-c", command};
-            Process p =Runtime.getRuntime().exec(cmdArray,null);
+            Process p = Runtime.getRuntime().exec(cmdArray,null);
             aa = new BufferedReader(new InputStreamReader(p.getInputStream()));
             p.waitFor();
         }catch (Exception e){

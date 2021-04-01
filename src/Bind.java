@@ -11,9 +11,12 @@ public class Bind {
             BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
             BufferedReader br = new BufferedReader(new FileReader(filename));
             String str;
+            StringBuilder sb = null;
             while ((str = br.readLine()) != null){
+                sb.setLength(0);
                 String[] temp = str.split("\t");
-                bw.write(temp[0] + "-" + temp[1] + "\t" + temp[2]);
+                sb.append(temp[0]).append("-").append(temp[1]).append("\t").append(temp[2]);
+                bw.write(sb.toString());
                 bw.write("\n");
             }
 
