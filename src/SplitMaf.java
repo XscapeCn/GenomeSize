@@ -26,8 +26,6 @@ public class SplitMaf {
                 tempArr1.add(str);
             }
 
-
-
             while((str = br.readLine()) != null){
                 if (str.startsWith("a") || str.startsWith("s")){
                     tempArr1.add(str);
@@ -53,7 +51,6 @@ public class SplitMaf {
             System.exit(1);
         }
     }
-
 
     public static void writeMaf(List<List<String>> arr, int number){
 

@@ -3,7 +3,7 @@ import java.util.Arrays;
 
 public class SomethingInteresting {
     public static void main(String[] args) {
-
+        threadVSRunnable();
     }
 
     /**\
@@ -23,9 +23,9 @@ public class SomethingInteresting {
      * which is Inherit only if you want to override some behavior.
      * Inherit less, interface more.
      */
-    void threadVSRunnable(){
+    static void threadVSRunnable(){
         extendsThread ext = new extendsThread();
-        ext.run();
+        ext.start();
         implementRunnable imr = new implementRunnable();
         imr.run();
     }
