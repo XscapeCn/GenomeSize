@@ -76,7 +76,6 @@ public class SplitMaf {
     }
 }
 
-
 //        List<List<String>> chr01 = new ArrayList<>();
 //        List<List<String>> chr02 = new ArrayList<>();
 //        List<List<String>> chr03 = new ArrayList<>();
@@ -89,7 +88,6 @@ public class SplitMaf {
 //        List<List<String>> chr10 = new ArrayList<>();
 //        List<List<String>> chr11 = new ArrayList<>();
 //        List<List<String>> chr12 = new ArrayList<>();
-
 
 //            while (str != null){
 //                List<String> tempArr = new ArrayList<>();
@@ -112,7 +110,6 @@ public class SplitMaf {
 //                    }
 //                }
 //            }
-
 
 //                else if (tempArr.get(1).contains("chr1 ")){
 //                    chr01.add(tempArr);
@@ -140,10 +137,6 @@ public class SplitMaf {
 //                    chr12.add(tempArr);
 //                }
 
-
-
-
-
 //            writeMaf(chr01);
 //            writeMaf(chr02);
 //            writeMaf(chr03);
@@ -156,7 +149,6 @@ public class SplitMaf {
 //            writeMaf(chr10);
 //            writeMaf(chr11);
 //            writeMaf(chr12);
-
 
 //        else if (arr.get(0).get(1).contains("chr1 ")){
 //            mark = "chr1.maf";
@@ -183,4 +175,3 @@ public class SplitMaf {
 //        }else if (arr.get(0).get(1).contains("chr12")){
 //            mark = "chr12.maf";
 //        }
-

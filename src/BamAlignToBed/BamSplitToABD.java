@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggerFactory;
 
-
 public class BamSplitToABD extends StreamAlignWithCon{
     private static final Logger logger = Logger.getLogger(BamSplitToABD.class.getName());
     final int[] A = {1,2,7,8,13,14,19,20,25,26,31,32,37,38};
@@ -121,6 +120,10 @@ public class BamSplitToABD extends StreamAlignWithCon{
         long BDepth = 0;
         long DDepth = 0;
 
+        long ACol = 0;
+        long BCol = 0;
+        long DCol = 0;
+
         try{
             StringBuilder command = new StringBuilder();
             command.append("samtools depth -Q 20 ").append(this.path).append(file);
@@ -139,10 +142,13 @@ public class BamSplitToABD extends StreamAlignWithCon{
 
                 if (AA.contains(start)){
                     ADepth += Long.parseLong(temp[2]);
+                    ACol += 1;
                 } else if (BB.contains(start)){
                     BDepth += Long.parseLong(temp[2]);
+                    BCol += 1;
                 } else if (DD.contains(start)){
                     DDepth += Long.parseLong(temp[2]);
+                    DCol += 1;
                 }
             }
             br.close();
@@ -152,7 +158,7 @@ public class BamSplitToABD extends StreamAlignWithCon{
             e.printStackTrace();
             System.exit(1);
         }
-        String[] res = new String[]{file, String.valueOf(ADepth), String.valueOf(BDepth), String.valueOf(DDepth), String.valueOf(ADepth + BDepth + DDepth)};
+        String[] res = new String[]{file, String.valueOf(ADepth), String.valueOf(BDepth), String.valueOf(DDepth), String.valueOf(ADepth + BDepth + DDepth),String.valueOf(ACol), String.valueOf(BCol), String.valueOf(DCol), String.valueOf(ACol + BCol + DCol)};
 
         synchronized (lock){
             this.out.add(res);
@@ -167,7 +173,11 @@ public class BamSplitToABD extends StreamAlignWithCon{
             BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
             for (String[] strings : out) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(strings[0]).append("\t").append(strings[1]).append("\t").append(strings[2]).append("\t").append(strings[3]).append("\t").append(strings[4]).append("\n");
+                for (int i = 0; i < strings.length; i++) {
+                    sb.append(strings[i]).append("\t");
+                }
+//                sb.append(strings[0]).append("\t").append(strings[1]).append("\t").append(strings[2]).append("\t").append(strings[3]).append("\t").append(strings[4]).append("\n");
+                sb.append("\n");
                 bw.write(sb.toString());
             }
             bw.close();
@@ -189,4 +199,3 @@ public class BamSplitToABD extends StreamAlignWithCon{
         new BamSplitToABD(args[0], Integer.parseInt(args[1]));
     }
 }
-
