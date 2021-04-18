@@ -1,12 +1,10 @@
 package BamAlignToBed;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,9 +14,6 @@ import java.util.stream.IntStream;
 
 public class CRC {
     private static final Logger logger = Logger.getLogger(BamSplitToABD.class.getName());
-    final int[] A = {1,2,7,8,13,14,19,20,25,26,31,32,37,38};
-    final int[] B = {3,4,9,10,15,16,21,22,27,28,33,34,39,40};
-    final int[] D = {5,6,11,12,17,18,23,24,29,30,35,36,41,42};
     HashSet<String> AA = new HashSet<>();
     HashSet<String> BB = new HashSet<>();
     HashSet<String> DD = new HashSet<>();
@@ -31,7 +26,7 @@ public class CRC {
     int sf;
     int ef;
     List<String> res = new ArrayList<>();
-    List<Set<Integer>> refBed;
+    List<HashSet<Integer>> refBed;
     public static final Object lock = new Object();
     Options options = new Options();
 
@@ -44,16 +39,20 @@ public class CRC {
     }
 
     public void initialize(){
+        int[] A = {1,2,7,8,13,14,19,20,25,26,31,32,37,38};
+        int[] B = {3,4,9,10,15,16,21,22,27,28,33,34,39,40};
+        int[] D = {5,6,11,12,17,18,23,24,29,30,35,36,41,42};
+
         for (int a:A) {AA.add(String.valueOf(a));}
         for (int b:B) {BB.add(String.valueOf(b));}
         for (int d:D) {DD.add(String.valueOf(d));}
+        if (!path.endsWith("/")) path += "/";
 
         if (sf < 0){
             files = readPath(this.path);
         } else {
             files = readPath(this.path, sf, ef);
         }
-
         this.refBed = readDic(bed);
     }
 
@@ -65,7 +64,7 @@ public class CRC {
         options.addOption("b", true, "Bed file location");
         options.addOption("p", true, "Bam file location");
         options.addOption("o", true, "Out file location, optional");
-        options.addOption("r", true, "Out file location, optional");
+        options.addOption("r", true, "Bp per read");
     }
 
     public void retrieveParameters(String[] args) {
@@ -101,16 +100,14 @@ public class CRC {
         }
         catch(Exception e) {
             optionFormat.printHelp("CRC.jar", options );
-//            e.printStackTrace();
             System.exit(0);
         }
     }
 
-    List<Set<Integer>> readDic(String filename){
-        List<Set<Integer>> res = new ArrayList<>();
+    List<HashSet<Integer>> readDic(String filename){
+        List<HashSet<Integer>> res = new ArrayList<>();
         for (int i = 0; i < 42; i++) {
-            res.add(new HashSet<Integer>()
-            );
+            res.add(new HashSet<Integer>());
         }
         try{
             BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -128,11 +125,11 @@ public class CRC {
     }
 
     public int checkPool(int pool){
-        if ( 10 <= pool && pool <= 40){
-            System.out.println("Threads will be set as " + pool);
+        if ( 5 <= pool && pool <= 64){
+            logger.info("Threads will be set as " + pool);
             return pool;
         }else {
-            System.out.println("Invalid thread input, it will default to 32");
+            logger.warn("Invalid thread input, it will default to 32");
             return 32;
         }
     }
@@ -146,7 +143,7 @@ public class CRC {
             assert tempList != null;
             for (File file : tempList) {
                 if (file.isFile() && file.toString().endsWith(".bam")) {
-                    files.add(file.toString());
+                    files.add(file.getName());
                 }
             }
         }
@@ -159,9 +156,10 @@ public class CRC {
         List<String> files = new ArrayList<>();
         File[] tempList = (new File(path)).listFiles();
         assert tempList != null;
+        int index;
         for (File file : tempList) {
             if (file.isFile() && file.toString().endsWith(".bam")) {
-                int index = obtainNum(file.getName());
+                index = obtainNum(file.getName());
                 if (range.contains(index)){
                     files.add(file.getName());
                 }
@@ -181,7 +179,6 @@ public class CRC {
         try{
             BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
             for (String strings : res) {
-//                sb.append(strings[0]).append("\t").append(strings[1]).append("\t").append(strings[2]).append("\t").append(strings[3]).append("\t").append(strings[4]).append("\n");
                 bw.write(strings);
                 bw.write("\n");
             }
@@ -198,7 +195,6 @@ public class CRC {
 
         for (String file:files) {
             logger.info("The processing file is " + file);
-//            System.out.println("The processing file is " + file);
             Thread t = new Thread(() -> compare(file, latch));
             es.submit(t);
         }
@@ -219,23 +215,18 @@ public class CRC {
         long DR = 0;
         List<Long> res = new ArrayList<>();
         StringBuilder cmd = new StringBuilder();
-        cmd.append("samtools view ").append(file);
+        cmd.append("samtools view ").append(path).append(file);
         String [] cmdArray ={"/bin/bash","-c", cmd.toString()};
         try{
             Process p = Runtime.getRuntime().exec(cmdArray,null);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String str = null;
+            String str;
+            String temp;
             long count = 0;
-
-
+            logger.info("Start calculate nRow, " + file);
             while ((str = br.readLine()) != null){
-                if (count == 100){
-//                    System.out.println(str);
-                    logger.info("Start calculate nRow, " + file);
-                }
                 count += 1;
-                String temp = str.split("\t")[2];
-//                System.out.println(temp);
+                temp = str.split("\t")[2];
 
                 if (AA.contains(temp)){
                     AR += 1;
@@ -244,6 +235,7 @@ public class CRC {
                 } else if (DD.contains(temp)){
                     DR += 1;
                 }
+
             }
             res.add(AR);
             res.add(BR);
@@ -255,24 +247,15 @@ public class CRC {
             e.printStackTrace();
             System.exit(1);
         }
-
         return res;
     }
 
     public void compare(String file, CountDownLatch latch){
-//        long ADepth = 0;
-//        long BDepth = 0;
-//        long DDepth = 0;
         List<Long> longs = nRow(file);
         long ADepth = longs.get(0);
         long BDepth = longs.get(1);
         long DDepth = longs.get(2);
         long count = longs.get(3);
-
-
-        long ACol = 0;
-        long BCol = 0;
-        long DCol = 0;
 
         long AC =0;
         long BC =0;
@@ -280,57 +263,42 @@ public class CRC {
 
         try{
             StringBuilder command = new StringBuilder();
-            command.append("samtools depth -Q 20 ").append(this.path).append(file);
-//            String command = "samtools depth -Q 20 " + this.path + file;
+            command.append("samtools depth -Q 20 ").append(path).append(file);
             String [] cmdArray ={"/bin/bash","-c", command.toString()};
             Process p = Runtime.getRuntime().exec(cmdArray,null);
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             logger.info("Start reading "+ file + " via BufferedRead.");
-//            System.out.println("Start reading "+ file + " via BufferedRead.");
 
             String str;
+            int startInt;
+            String[] temp;
+            String start;
             while ((str = br.readLine()) != null){
+                temp = str.split("\t");
+                startInt = Integer.parseInt(temp[0]);
 
-                String[] temp = str.split("\t");
-
-                int startInt = Integer.parseInt(temp[0]);
                 if (startInt < 1 || startInt > 42) continue;
 
-                String start = temp[0];
-                int fst = Integer.parseInt(temp[1]);
-                int sec = Integer.parseInt(temp[2]);
-
-                if (AA.contains(start)){
-//                    ADepth += sec;
-//                    ACol += 1;
-                    if (this.refBed.get(startInt - 1).contains(fst)){
-                        AC += sec;
-                    }
-                } else if (BB.contains(start)){
-//                    BDepth += sec;
-//                    BCol += 1;
-                    if (this.refBed.get(startInt - 1).contains(fst)){
-                        BC += sec;
-                    }
-                } else if (DD.contains(start)){
-//                    DDepth += sec;
-//                    DCol += 1;
-                    if (this.refBed.get(startInt - 1).contains(fst)){
-                        DC += sec;
+                start = temp[0];
+                if (this.refBed.get(startInt - 1).contains(Integer.parseInt(temp[1]))){
+//                    int sec = Integer.parseInt(temp[2]);
+                    if (AA.contains(start)) {
+                        AC += Integer.parseInt(temp[2]);
+                    } else if (BB.contains(start)){
+                        BC += Integer.parseInt(temp[2]);
+                    }else if (DD.contains(start)){
+                        DC += Integer.parseInt(temp[2]);
                     }
                 }
             }
             br.close();
             p.waitFor();
-
         }catch(Exception e){
             e.printStackTrace();
             System.exit(1);
         }
-        double AR = ((double) AC)/ADepth;
-        double BR = ((double) BC)/BDepth;
-        double DR = ((double) DC)/DDepth;
-        double SR = ((double) (AC + BC + DC))/(count * reads);
+
+        double AR = ((double) AC)/ADepth, BR = ((double) BC)/BDepth, DR = ((double) DC)/DDepth, SR = ((double) (AC + BC + DC))/(count * reads);
 
         StringBuilder sb = new StringBuilder();
         sb.append(file)
@@ -338,21 +306,14 @@ public class CRC {
                 .append("\t").append(ADepth).append("\t").append(BDepth).append("\t").append(DDepth).append("\t").append(count)
                 .append("\t").append(AR).append("\t").append(BR).append("\t").append(DR).append("\t").append(SR);
 
-//        String[] res = new String[]{file, String.valueOf(ADepth), String.valueOf(BDepth), String.valueOf(DDepth), String.valueOf(ADepth + BDepth + DDepth),String.valueOf(ACol), String.valueOf(BCol), String.valueOf(DCol), String.valueOf(ACol + BCol + DCol)};
-
         synchronized (lock){
-//            br.write(sb.toString());
             this.res.add(sb.toString());
         }
         logger.info(file + " done.");
-//        System.out.println(file + " done and the cost is " + (System.currentTimeMillis() - startTime));
         latch.countDown();
     }
 
     public static void main(String[] args) {
-        CRC crc = new CRC(args);
-//        System.out.println(crc.path);
-//        System.out.println(crc.pool);
-//        for (int a: crc.AA) { System.out.println(a); }
+        new CRC(args);
     }
 }
