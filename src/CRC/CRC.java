@@ -51,18 +51,15 @@ public class CRC extends Basic{
         HelpFormatter optionFormat = new HelpFormatter();
         try {
             CommandLine cmd = parser.parse(options, args);
-//            if (cmd.hasOption("p") && cmd.hasOption("r") && cmd.hasOption("b")){
-//                path = cmd.getOptionValue("p");
-//                bed = cmd.getOptionValue("b");
-//                reads = Integer.parseInt(cmd.getOptionValue("r"));
+            if (cmd.hasOption("p") && cmd.hasOption("r") && cmd.hasOption("b")){
+                path = cmd.getOptionValue("p");
+                bed = cmd.getOptionValue("b");
+                reads = Integer.parseInt(cmd.getOptionValue("r"));
 
-            if (cmd.hasOption("p")){
-                path = cmd.getOptionValue("p");}
-
-//            }else {
-//                optionFormat.printHelp("CRC.jar", options );
-//                System.exit(0);
-//            }
+            }else {
+                optionFormat.printHelp("CRC.jar", options );
+                System.exit(0);
+            }
 
             if (cmd.hasOption("t")){
                 this.pool = checkPool(Integer.parseInt(cmd.getOptionValue("t")));

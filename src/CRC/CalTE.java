@@ -160,14 +160,11 @@ public class CalTE extends Basic{
                 file.delete();
             }
 
-
-
         }catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
         return new int[]{DHH,DTA,DTB,DTC,DTH,DTM,DTT,DTX,DXX,RIX,RLC,RLG,RLX,RSX,count};
-
     }
 
     public void calTE(String file, CountDownLatch latch){
@@ -194,18 +191,14 @@ public class CalTE extends Basic{
         for (String file:files) {
             logger.info("The processing file is " + file);
             Thread t = new Thread(() -> calTE(file, latch));
-//            Thread t = new Thread(() -> compare(file, latch));
             es.submit(t);
 
-            //specify for the calTE
             try {
                 Thread.sleep(600000);
             }catch (Exception e){
                 e.printStackTrace();
                 System.exit(1);
             }
-
-
         }
         try{
             latch.await();
@@ -217,5 +210,4 @@ public class CalTE extends Basic{
             logger.info("EndEnd");
         }
     }
-
 }
