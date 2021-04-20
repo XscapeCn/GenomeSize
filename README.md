@@ -1,8 +1,9 @@
-# CRC 0.1.0 Release Notes
+# Genome Size Project
 
 
 
 ## ABSTRACT
+Here represents some scripts for the project.
 
 **C**onserved **R**atio **C**alculator is a toolkit designed to complete the calculation tasks of Genome Size project.
 
