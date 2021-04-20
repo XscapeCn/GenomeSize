@@ -53,10 +53,11 @@ The following parameters are must.
 
 
 ## INPUT
-
 The input files are provided to CRC using the `-p -b` parameters, in which the `-p` specify the path included bam files and `-b` specify the bed file.
 
 They are not required to locate in the same directory as your current.
+
+CalTE depends on [picard](https://github.com/broadinstitute/picard) and bowties, the interface of which is temporarily closed.
 
 
 
