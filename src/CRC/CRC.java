@@ -1,6 +1,6 @@
-package BamAlignToBed;
+package CRC;
 import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,27 +8,15 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-public class CRC {
-    private static final Logger logger = Logger.getLogger(BamSplitToABD.class.getName());
+public class CRC extends Basic{
     HashSet<String> AA = new HashSet<>();
     HashSet<String> BB = new HashSet<>();
     HashSet<String> DD = new HashSet<>();
-    List<String> files;
-    String outFile;
-    String path;
     String bed;
     int reads;
-    int pool;
-    int sf;
-    int ef;
-    List<String> res = new ArrayList<>();
+
     List<HashSet<Integer>> refBed;
-    public static final Object lock = new Object();
-    Options options = new Options();
 
     public CRC(String[] args){
         createOptions();
@@ -56,31 +44,25 @@ public class CRC {
         this.refBed = readDic(bed);
     }
 
-    public void createOptions() {
-        options = new Options();
-        options.addOption("sf", true, "The index of start file, optional");
-        options.addOption("ef", true, "The index of end file, optional");
-        options.addOption("t", true, "Thread, default to 32, optional");
-        options.addOption("b", true, "Bed file location");
-        options.addOption("p", true, "Bam file location");
-        options.addOption("o", true, "Out file location, optional");
-        options.addOption("r", true, "Bp per read");
-    }
+
 
     public void retrieveParameters(String[] args) {
         CommandLineParser parser = new DefaultParser();
         HelpFormatter optionFormat = new HelpFormatter();
         try {
             CommandLine cmd = parser.parse(options, args);
-            if (cmd.hasOption("p") && cmd.hasOption("r") && cmd.hasOption("b")){
-                path = cmd.getOptionValue("p");
-                bed = cmd.getOptionValue("b");
-                reads = Integer.parseInt(cmd.getOptionValue("r"));
+//            if (cmd.hasOption("p") && cmd.hasOption("r") && cmd.hasOption("b")){
+//                path = cmd.getOptionValue("p");
+//                bed = cmd.getOptionValue("b");
+//                reads = Integer.parseInt(cmd.getOptionValue("r"));
 
-            }else {
-                optionFormat.printHelp("CRC.jar", options );
-                System.exit(0);
-            }
+            if (cmd.hasOption("p")){
+                path = cmd.getOptionValue("p");}
+
+//            }else {
+//                optionFormat.printHelp("CRC.jar", options );
+//                System.exit(0);
+//            }
 
             if (cmd.hasOption("t")){
                 this.pool = checkPool(Integer.parseInt(cmd.getOptionValue("t")));
@@ -88,7 +70,7 @@ public class CRC {
 
             if (cmd.hasOption("o")){
                 outFile = cmd.getOptionValue("o");
-            }else {outFile = "./ABDSplit.out";}
+            }else {outFile = "./TERatio.out";}
 
             if (cmd.hasOption("sf")){
                 sf = Integer.parseInt(cmd.getOptionValue("sf"));
@@ -124,70 +106,7 @@ public class CRC {
         return res;
     }
 
-    public int checkPool(int pool){
-        if ( 5 <= pool && pool <= 64){
-            logger.info("Threads will be set as " + pool);
-            return pool;
-        }else {
-            logger.warn("Invalid thread input, it will default to 32");
-            return 32;
-        }
-    }
 
-    public List<String> readPath(String path){
-        List<String> files = new ArrayList<>();
-        if (path.endsWith(".bam")){
-            files.add(path);
-        }else {
-            File[] tempList = (new File(path)).listFiles();
-            assert tempList != null;
-            for (File file : tempList) {
-                if (file.isFile() && file.toString().endsWith(".bam")) {
-                    files.add(file.getName());
-                }
-            }
-        }
-        return files;
-    }
-
-    public List<String> readPath(String path, int start, int end){
-        List<Integer> range = IntStream.rangeClosed(start, end)
-                .boxed().collect(Collectors.toList());
-        List<String> files = new ArrayList<>();
-        File[] tempList = (new File(path)).listFiles();
-        assert tempList != null;
-        int index;
-        for (File file : tempList) {
-            if (file.isFile() && file.toString().endsWith(".bam")) {
-                index = obtainNum(file.getName());
-                if (range.contains(index)){
-                    files.add(file.getName());
-                }
-            }
-        }
-        return files;
-    }
-
-    public int obtainNum(String content) {
-        String regEx="[^0-9]+";
-        Pattern pattern = Pattern.compile(regEx);
-        String[] cs = pattern.split(content);
-        return Integer.parseInt(String.join("", cs));
-    }
-
-    public void writeOut(){
-        try{
-            BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
-            for (String strings : res) {
-                bw.write(strings);
-                bw.write("\n");
-            }
-            bw.close();
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
 
     public void concurrent(){
         final CountDownLatch latch = new CountDownLatch(files.size());
@@ -195,8 +114,19 @@ public class CRC {
 
         for (String file:files) {
             logger.info("The processing file is " + file);
+//            Thread t = new Thread(() -> calTE(file, latch));
             Thread t = new Thread(() -> compare(file, latch));
             es.submit(t);
+
+            //specify for the calTE
+            try {
+//                Thread.sleep(600000);
+            }catch (Exception e){
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+
         }
         try{
             latch.await();
@@ -298,7 +228,7 @@ public class CRC {
             System.exit(1);
         }
 
-        double AR = ((double) AC)/ADepth, BR = ((double) BC)/BDepth, DR = ((double) DC)/DDepth, SR = ((double) (AC + BC + DC))/(count * reads);
+        double AR = ((double) AC)/ADepth/reads, BR = ((double) BC)/BDepth/reads, DR = ((double) DC)/DDepth/reads, SR = ((double) (AC + BC + DC))/(count * reads);
 
         StringBuilder sb = new StringBuilder();
         sb.append(file)
@@ -311,9 +241,5 @@ public class CRC {
         }
         logger.info(file + " done.");
         latch.countDown();
-    }
-
-    public static void main(String[] args) {
-        new CRC(args);
     }
 }

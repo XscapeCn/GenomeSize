@@ -26,12 +26,12 @@ public class Test {
         long BDepth = 0;
         long DDepth = 0;
 
-        int index = 100000000;
+        int index = 100000;
 
-        List<Integer> AAA = new ArrayList<>();
-        for (int i = 0 , length = A.length; i < length; i++) {
-            AAA.add(A[i]);
-        }
+//        List<Integer> AAA = new ArrayList<>();
+//        for (int i = 0 , length = A.length; i < length; i++) {
+//            AAA.add(A[i]);
+//        }
 
 //        long startTime=System.currentTimeMillis();
 //        for (int i = 0; i < index; i++) {
@@ -55,11 +55,13 @@ public class Test {
 //        System.out.println(System.currentTimeMillis() - startTime1);
 //        System.out.println("===============");
 
+        String str = "V300016179L3C004R020879409 83 RIX_Taes_Stasy_consensus-1 274 6 100M = 150 -224 TCCTTAGTGGCACGCTACATCGGCGCCCGGATGTAGTGGAAAATGTGCAAGGGTCTTCGCATTTGACTCGACGAGTGCGAAGGGTAAGGAAGCTAGCCGA ECFGFGGGFFGFGFFGFD=FFAGFF=F(GFFFEFFFDFF?EGFFDFFGFFGFFBGFFFDACFGFF+CFC@F@FFGFFFGGFF>FGGGCFFFDFEFFFFDF AS:i:-10XS:i:-15 XN:i:0 XM:i:2 XO:i:0 XG:i:0 NM:i:2 MD:Z:11G33A54 YS:i:0 YT:Z:CP";
 
+        int count1 = 0;
         long startTime2=System.currentTimeMillis();
         for (int i = 0; i < index; i++) {
-            if (i % (AAA.get(1)) == 0){
-                AI += 1;
+            if (str.contains("100M")){
+                count1 += 1;
             }
         }
 
@@ -68,9 +70,11 @@ public class Test {
 
 
         long startTime3=System.currentTimeMillis();
+        int count = 0;
         for (int i = 0; i < index; i++) {
-            if (i % (A[1]) == 0){
-                BI += 1;
+            String[] temp = str.split(" ");
+            if (temp[5] == "100M"){
+                count +=1;
             }
         }
         System.out.println(System.currentTimeMillis() - startTime3);
