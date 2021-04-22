@@ -67,7 +67,7 @@ public class CRC extends Basic{
 
             if (cmd.hasOption("o")){
                 outFile = cmd.getOptionValue("o");
-            }else {outFile = "./TERatio.out";}
+            }else {outFile = "./ABDSplit.out";}
 
             if (cmd.hasOption("sf")){
                 sf = Integer.parseInt(cmd.getOptionValue("sf"));

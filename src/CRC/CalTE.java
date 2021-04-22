@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CalTE extends Basic{
-
     public CalTE(String[] args){
         createOptions();
         retrieveParameters(args);
@@ -124,32 +123,46 @@ public class CalTE extends Basic{
                     {
                         case "DHH" :
                             DHH += 1;
+                            break;
                         case "DTA" :
                             DTA += 1;
+                            break;
                         case "DTB" :
                             DTB += 1;
+                            break;
                         case "DTC" :
                             DTC += 1;
+                            break;
                         case "DTH" :
                             DTH += 1;
+                            break;
                         case "DTM" :
                             DTM += 1;
+                            break;
                         case "DTT" :
                             DTT += 1;
+                            break;
                         case "DTX" :
                             DTX += 1;
+                            break;
                         case "DXX" :
                             DXX += 1;
+                            break;
                         case "RIX" :
                             RIX += 1;
+                            break;
                         case "RLC" :
                             RLC += 1;
+                            break;
                         case "RLG" :
                             RLG += 1;
+                            break;
                         case "RLX" :
                             RLX += 1;
+                            break;
                         case "RSX" :
                             RSX += 1;
+                            break;
                     }
                 }
             }
