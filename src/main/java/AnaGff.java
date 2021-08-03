@@ -65,8 +65,7 @@ public class AnaGff {
 
     public static int getSum(List<Integer> a){
         int sum = 0;
-        for (int aa:a
-             ) {
+        for (int aa:a) {
             sum += aa;
         }
         return sum;
