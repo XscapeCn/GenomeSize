@@ -34,6 +34,7 @@ public class SimulateGFF {
 
             res.add(temp);
             res.remove(0);
+            br.close();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,11 +50,11 @@ public class SimulateGFF {
             if (i > 0){
                 String s = block.get(i - 1).get(block.get(i - 1).size() - 1)[4];
                 String e = block.get(i).get(0)[3];
-                if (Integer.parseInt(e) > Integer.parseInt(s)){
+                if ((Integer.parseInt(e) - 3003)> (Integer.parseInt(s) + 3003)){
                     temp.add(getInter(block.get(i).get(0),s,e));
                     res.add(temp);
-                    temp = new ArrayList<>();
                 }
+                temp = new ArrayList<>();
             }
             res.add(operate(block.get(i)));
         }
@@ -72,7 +73,9 @@ public class SimulateGFF {
                     return res;
                 }else {
                     if (block.get(i+1)[2].equals("exon")){
-                        res.add(getIntro(block.get(i),block.get(i + 1)[3]));
+                        if (Integer.parseInt(block.get(i+1)[3]) - Integer.parseInt(block.get(i)[4]) > 2){
+                            res.add(getIntro(block.get(i),block.get(i + 1)[3]));
+                        }
                     }
                 }
             }else {
