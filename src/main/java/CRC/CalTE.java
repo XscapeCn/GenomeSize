@@ -194,7 +194,6 @@ public class CalTE extends Basic{
         res.add(sb.toString());
         logger.info(file + " done.");
         latch.countDown();
-
     }
 
     public void concurrent(){
