@@ -1,6 +1,8 @@
 /out/
 /src/artifact/
 /src/META-INF/
-/.idea/
 /out/artifacts/GS_jar/
 /target/
+.idea/
+.idea
+*class
